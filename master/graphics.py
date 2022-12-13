@@ -1,4 +1,5 @@
 import pygame
+import config
 
 _circle_cache = {}
 
@@ -24,16 +25,16 @@ def bresenham_circle(r):
     return points
 
 
-def draw_text(surface, text, font, fcolor, ocolor, pos, opx=2, antialias=True):
+def draw_text(surface, text, font, fcolor, ocolor, pos, opx=2):
     pos_x, pos_y = pos
-    textsurface = font.render(text, antialias, fcolor).convert_alpha()
+    textsurface = font.render(text, config.font_antialias, fcolor).convert_alpha()
     w = textsurface.get_width() + 2 * opx
     h = font.get_height() + 2 * opx
 
     osurf = pygame.Surface((w, h)).convert_alpha()
     osurf.fill((0, 0, 0, 0))
 
-    osurf.blit(font.render(text, antialias, ocolor).convert_alpha(), (0, 0))
+    osurf.blit(font.render(text, config.font_antialias, ocolor).convert_alpha(), (0, 0))
 
     for dx, dy in bresenham_circle(opx):
         surface.blit(osurf, (pos_x + dx + opx, pos_y + dy + opx))
