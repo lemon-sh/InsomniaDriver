@@ -11,7 +11,7 @@ import config
 import detector
 import graphics
 
-print(f"MediaPipe {mp.__version__}\nOpenCV {cv2.__version__}\n")
+print(f"MediaPipe {mp.__version__ if hasattr(mp, '__version__') else '<unknown>'}\nOpenCV {cv2.__version__}\n")
 
 print("Intializing display...")
 pygame.init()

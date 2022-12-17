@@ -32,6 +32,6 @@ alarm_sound = "alarm.ogg"
 # first is the highest priority, last is the lowest
 # if no mode from this list maches, first is the default
 supported_video_modes = [
-    # (1280, 720),
+    (1280, 720),
     (800, 480)
 ]
