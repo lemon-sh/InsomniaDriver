@@ -46,6 +46,7 @@ else:
         return pygame.font.SysFont(pygame.font.get_default_font(), size)
 
 font = get_font(config.font_size)
+alert_font = get_font(config.font_size * 2)
 title_font = get_font(config.font_size * 4)
 
 title_text = "InsomniaDriver"
@@ -60,8 +61,8 @@ sub_y = title_y + title_size_y
 
 init_text = "Wczytywanie..."
 init_size_x, init_size_y = font.size(init_text)
-init_x = screen_x/2 - init_size_x/2
-init_y = sub_y+init_size_y+40
+init_x = screen_x / 2 - init_size_x / 2
+init_y = sub_y + init_size_y + 40
 
 screen.fill(config.shadow)
 graphics.draw_text(screen, title_text, title_font, config.white, config.black, (title_x, title_y))
@@ -81,6 +82,31 @@ else:
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, screen_x)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, screen_y)
+render_next = True
+
+if config.environment == "DEV":
+    alarm = alarm.Alarm(alarm.Alarm.OUTPUT_SOUND, config.alarm_sound)
+
+
+    def process_input():
+        global render_next
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_x:
+                    alarm.disable()
+                elif event.key == pygame.K_q:
+                    render_next = False
+elif config.environment == "PROD":
+    alarm = alarm.Alarm(alarm.Alarm.OUTPUT_EXT)
+
+
+    def process_input():
+        global render_next
+        pygame.event.pump()
+        # TODO: raspberry pi code
+else:
+    raise ValueError(f"Invalid environment type '{config.environment}'.")
 
 fpsf_width, fpsf_height = font.size("FPS: 999.9")
 flash_pos = (20, 20)
@@ -88,10 +114,9 @@ stats_pos = (20, screen_y - fpsf_height - 20)
 fpsf_pos = (screen_x - fpsf_width - 20, screen_y - fpsf_height - 20)
 
 drowsy_detector = detector.DrowsyDetector()
-alarm = alarm.Alarm(config.alarm_type, config.alarm_sound)
 fps = 0
-graphics.font_antialias(config.font_antialias)
-render_next = True
+graphics.set_font_antialias(config.font_antialias)
+
 while render_next:
     fpsc_start = time.perf_counter()
 
@@ -107,29 +132,23 @@ while render_next:
         graphics.draw_eye_landmarks(screen, drowsy_detector.coordinates[0], drowsy_detector.coordinates[1], config.blue)
         ear = round(drowsy_detector.ear, 3)
         drowsy_time = round(drowsy_detector.drowsy_time, 3)
-        graphics.draw_text(screen, f"EAR: {ear}; Przysypianie: {drowsy_time}", font, config.blue, config.shadow,
+        if drowsy_detector.eyes_closed:
+            color = config.lightred
+        else:
+            color = config.blue
+        graphics.draw_text(screen, f"EAR: {ear}; Przysypianie: {drowsy_time}", font, color, config.shadow,
                            stats_pos)
         if drowsy_detector.alarm:
             alarm.enable()
 
         if alarm.get_enabled():
-            graphics.draw_text(screen, "Alert!", font, config.red, config.shadow, flash_pos)
+            graphics.draw_text(screen, "Alert!", alert_font, config.red, config.shadow, flash_pos)
         else:
             graphics.draw_text(screen, "Gotowość.", font, config.green, config.shadow, flash_pos)
     else:
         graphics.draw_text(screen, "Nie wykryto mordy", font, config.red, config.shadow, flash_pos)
 
-    if config.alarm_type == alarm.TYPE_PHYSICAL:
-        pygame.event.pump()
-        # TODO: raspberry pi code
-    else:
-        events = pygame.event.get()
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_x:
-                    alarm.disable()
-                elif event.key == pygame.K_q:
-                    render_next = False
+    process_input()
 
     graphics.draw_text(screen, f"FPS: {fps}", font, config.white, config.shadow, fpsf_pos)
     pygame.display.flip()

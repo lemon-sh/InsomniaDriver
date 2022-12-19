@@ -2,47 +2,52 @@ import pygame.mixer
 
 
 class Alarm:
-    TYPE_DEV = 0
-    TYPE_PHYSICAL = 1
+    # sound notification
+    OUTPUT_SOUND = 0
+    # http request to slave
+    OUTPUT_EXT = 1
 
-    def __init__(self, alarm_type, alarm_sound=None):
-        if alarm_type not in range(2):
-            raise ValueError(f"Invalid alarm type '{alarm_type}'")
-        if alarm_sound is None and alarm_type == self.TYPE_DEV:
-            raise ValueError("You must supply an alarm sound when using the TYPE_DEV alarm type")
+    def __init__(self, output_type, alarm_sound=None):
+        if output_type not in range(2):
+            raise ValueError("Invalid output type")
+        if alarm_sound is None and output_type == self.OUTPUT_SOUND:
+            raise ValueError("You must supply an alarm sound when using the OUTPUT_SOUND type")
         
         self._on = False
-        self._alarm_type = alarm_type
+        self._output_type = output_type
         
-        if self._alarm_type == self.TYPE_PHYSICAL:
-            # TODO: raspberry pi code
-            pass
-        else:
+        if self._output_type == self.OUTPUT_SOUND:
             pygame.mixer.music.load(alarm_sound)
             pygame.mixer.music.play(-1)
             pygame.mixer.music.pause()
+        else:
+            # TODO: raspberry pi code
+            pass
 
     def enable(self):
         if self._on:
             return
-        if self._alarm_type == self.TYPE_PHYSICAL:
-            # TODO: raspberry pi code
-            pass
-        else:
+
+        if self._output_type == self.OUTPUT_SOUND:
             pygame.mixer.music.set_pos(0)
             pygame.mixer.music.unpause()
+        else:
+            # TODO: raspberry pi code
+            pass
+
         self._on = True
 
     def disable(self):
         if not self._on:
             return
-        if self._alarm_type == self.TYPE_PHYSICAL:
+
+        if self._output_type == self.OUTPUT_SOUND:
+            pygame.mixer.music.pause()
+        else:
             # TODO: raspberry pi code
             pass
-        else:
-            pygame.mixer.music.pause()
+
         self._on = False
 
     def get_enabled(self):
         return self._on
-

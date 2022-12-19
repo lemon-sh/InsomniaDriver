@@ -17,21 +17,23 @@ font = "CozetteVector.ttf"
 red = (255, 50, 50)
 green = (100, 255, 100)
 blue = (80, 80, 255)
+lightblue = (100, 100, 255)
+lightred = (255, 100, 100)
 
 white = (250, 250, 250)
 gray = (100, 100, 100)
 shadow = (10, 10, 10)
 black = (0, 0, 0)
 
+# -- ENVIRONMENT
+
+# DEV - sound alarm, keyboard input
+# PROD - external alarm, GPIO input
+environment = "DEV"
+
 # -- ALARM
 
-from alarm import Alarm
-
-# TYPE_DEV = keyboard input, sound output
-# TYPE_PHYSICAL = gpio input, http output
-alarm_type = Alarm.TYPE_DEV
-
-# required for TYPE_DEV only
+# required for development environment only
 alarm_sound = "alarm.ogg"
 
 # -- VIDEO MODES

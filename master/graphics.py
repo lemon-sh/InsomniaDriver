@@ -4,7 +4,7 @@ _circle_cache = {}
 _antialias = True
 
 
-def font_antialias(antialias):
+def set_font_antialias(antialias):
     global _antialias
     _antialias = antialias
 
