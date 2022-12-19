@@ -25,6 +25,13 @@ black = (0, 0, 0)
 
 # -- ALARM
 
+from alarm import Alarm
+
+# TYPE_DEV = keyboard input, sound output
+# TYPE_PHYSICAL = gpio input, http output
+alarm_type = Alarm.TYPE_DEV
+
+# required for TYPE_DEV only
 alarm_sound = "alarm.ogg"
 
 # -- VIDEO MODES

@@ -1,4 +1,4 @@
-print("InsomniaDriver 0.1.0 | PŚK Platynowy Indeks / Team SQL Injection\nLoading libraries...")
+print("InsomniaDriver | PŚK Platynowy Indeks / Team SQL Injection\nLoading libraries...")
 
 import sys
 import time
@@ -10,8 +10,11 @@ import pygame
 import config
 import detector
 import graphics
+import alarm
 
-print(f"MediaPipe {mp.__version__ if hasattr(mp, '__version__') else '<unknown>'}\nOpenCV {cv2.__version__}\n")
+mpver = mp.__version__ if hasattr(mp, '__version__') else '<unknown>'
+cv2ver = cv2.__version__
+print(f"MediaPipe {mpver}\nOpenCV {cv2ver}\n")
 
 print("Intializing display...")
 pygame.init()
@@ -82,18 +85,15 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, screen_y)
 fpsf_width, fpsf_height = font.size("FPS: 999.9")
 flash_pos = (20, 20)
 stats_pos = (20, screen_y - fpsf_height - 20)
-# alarm_pos = (20, stats_pos[1]-fpsf_height-10)
 fpsf_pos = (screen_x - fpsf_width - 20, screen_y - fpsf_height - 20)
 
-pygame.mixer.music.load(config.alarm_sound)
-pygame.mixer.music.play(-1)
-pygame.mixer.music.pause()
-
 drowsy_detector = detector.DrowsyDetector()
+alarm = alarm.Alarm(config.alarm_type, config.alarm_sound)
 fps = 0
-while True:
+graphics.font_antialias(config.font_antialias)
+render_next = True
+while render_next:
     fpsc_start = time.perf_counter()
-    pygame.event.pump()
 
     ret, image = cap.read()
     if not ret:
@@ -103,27 +103,33 @@ while True:
     screen.fill((0, 0, 0))
     screen.blit(pgimage, pgimage.get_rect())
 
-    alert = pygame.mixer.music.get_busy()
     if drowsy_detector.detection:
         graphics.draw_eye_landmarks(screen, drowsy_detector.coordinates[0], drowsy_detector.coordinates[1], config.blue)
         ear = round(drowsy_detector.ear, 3)
         drowsy_time = round(drowsy_detector.drowsy_time, 3)
         graphics.draw_text(screen, f"EAR: {ear}; Przysypianie: {drowsy_time}", font, config.blue, config.shadow,
                            stats_pos)
-        if drowsy_detector.alarm and not alert:
-            pygame.mixer.music.set_pos(0)
-            pygame.mixer.music.unpause()
-            alert = True
+        if drowsy_detector.alarm:
+            alarm.enable()
 
-        if alert:
+        if alarm.get_enabled():
             graphics.draw_text(screen, "Alert!", font, config.red, config.shadow, flash_pos)
         else:
             graphics.draw_text(screen, "Gotowość.", font, config.green, config.shadow, flash_pos)
     else:
         graphics.draw_text(screen, "Nie wykryto mordy", font, config.red, config.shadow, flash_pos)
 
-    if pygame.key.get_pressed()[pygame.K_x] and alert:
-        pygame.mixer.music.pause()
+    if config.alarm_type == alarm.TYPE_PHYSICAL:
+        pygame.event.pump()
+        # TODO: raspberry pi code
+    else:
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_x:
+                    alarm.disable()
+                elif event.key == pygame.K_q:
+                    render_next = False
 
     graphics.draw_text(screen, f"FPS: {fps}", font, config.white, config.shadow, fpsf_pos)
     pygame.display.flip()
