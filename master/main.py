@@ -1,16 +1,15 @@
 print("InsomniaDriver | PŚK Platynowy Indeks / Team SQL Injection\nLoading libraries...")
 
-import sys
-import time
-
-import cv2
-import mediapipe as mp
-import pygame
-
-import config
-import detector
+from alarm import Alarm
+from detector import DrowsyDetector
 import graphics
-import alarm
+import config
+import pygame
+import mediapipe as mp
+import cv2
+import time
+import sys
+
 
 mpver = mp.__version__ if hasattr(mp, '__version__') else '<unknown>'
 cv2ver = cv2.__version__
@@ -65,9 +64,12 @@ init_x = screen_x / 2 - init_size_x / 2
 init_y = sub_y + init_size_y + 40
 
 screen.fill(config.shadow)
-graphics.draw_text(screen, title_text, title_font, config.white, config.black, (title_x, title_y))
-graphics.draw_text(screen, sub_text, font, config.gray, config.black, (sub_x, sub_y))
-graphics.draw_text(screen, init_text, font, config.green, config.black, (init_x, init_y))
+graphics.draw_text(screen, title_text, title_font,
+                   config.white, config.black, (title_x, title_y))
+graphics.draw_text(screen, sub_text, font, config.gray,
+                   config.black, (sub_x, sub_y))
+graphics.draw_text(screen, init_text, font, config.green,
+                   config.black, (init_x, init_y))
 pygame.display.flip()
 
 if sys.platform == "win32":
@@ -84,10 +86,7 @@ cap.set(cv2.CAP_PROP_FRAME_WIDTH, screen_x)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, screen_y)
 render_next = True
 
-if config.environment == "DEV":
-    alarm = alarm.Alarm(alarm.Alarm.OUTPUT_SOUND, config.alarm_sound)
-
-
+if config.input_mode == "keyboard":
     def process_input():
         global render_next
         events = pygame.event.get()
@@ -97,23 +96,27 @@ if config.environment == "DEV":
                     alarm.disable()
                 elif event.key == pygame.K_q:
                     render_next = False
-elif config.environment == "PROD":
-    alarm = alarm.Alarm(alarm.Alarm.OUTPUT_EXT)
-
-
+elif config.input_mode == "rpi":
     def process_input():
         global render_next
         pygame.event.pump()
         # TODO: raspberry pi code
 else:
-    raise ValueError(f"Invalid environment type '{config.environment}'.")
+    raise ValueError(f"Invalid input mode '{config.input_mode}'.")
+
+if config.alarm_type == "sound":
+    alarm = Alarm(Alarm.OUTPUT_SOUND, config.alarm_sound)
+elif config.alarm_type == "external":
+    alarm = Alarm(Alarm.OUTPUT_EXT)
+else:
+    raise ValueError(f"Invalid alarm type: '{config.alarm_type}'.")
 
 fpsf_width, fpsf_height = font.size("FPS: 999.9")
 flash_pos = (20, 20)
 stats_pos = (20, screen_y - fpsf_height - 20)
 fpsf_pos = (screen_x - fpsf_width - 20, screen_y - fpsf_height - 20)
 
-drowsy_detector = detector.DrowsyDetector()
+drowsy_detector = DrowsyDetector()
 fps = 0
 graphics.set_font_antialias(config.font_antialias)
 
@@ -123,34 +126,37 @@ while render_next:
     ret, image = cap.read()
     if not ret:
         break
-    drowsy_detector.feed(image, config.ear_threshold, config.wait_time_threshold)
+    drowsy_detector.feed(image, config.ear_threshold,
+                         config.wait_time_threshold)
     pgimage = graphics.cvimage_to_pygame(image)
     screen.fill((0, 0, 0))
     screen.blit(pgimage, pgimage.get_rect())
 
     if drowsy_detector.detection:
-        graphics.draw_eye_landmarks(screen, drowsy_detector.coordinates[0], drowsy_detector.coordinates[1], config.blue)
+        graphics.draw_eye_landmarks(
+            screen, drowsy_detector.coordinates[0], drowsy_detector.coordinates[1], config.blue)
         ear = round(drowsy_detector.ear, 3)
         drowsy_time = round(drowsy_detector.drowsy_time, 3)
-        if drowsy_detector.eyes_closed:
-            color = config.lightred
-        else:
-            color = config.blue
+        color = config.lightred if drowsy_detector.eyes_closed else config.blue
         graphics.draw_text(screen, f"EAR: {ear}; Przysypianie: {drowsy_time}", font, color, config.shadow,
                            stats_pos)
         if drowsy_detector.alarm:
             alarm.enable()
 
         if alarm.get_enabled():
-            graphics.draw_text(screen, "Alert!", alert_font, config.red, config.shadow, flash_pos)
+            graphics.draw_text(screen, "Alert!", alert_font,
+                               config.red, config.shadow, flash_pos)
         else:
-            graphics.draw_text(screen, "Gotowość.", font, config.green, config.shadow, flash_pos)
+            graphics.draw_text(screen, "Gotowość.", font,
+                               config.green, config.shadow, flash_pos)
     else:
-        graphics.draw_text(screen, "Nie wykryto mordy", font, config.red, config.shadow, flash_pos)
+        graphics.draw_text(screen, "Nie wykryto mordy", font,
+                           config.red, config.shadow, flash_pos)
 
     process_input()
 
-    graphics.draw_text(screen, f"FPS: {fps}", font, config.white, config.shadow, fpsf_pos)
+    graphics.draw_text(
+        screen, f"FPS: {fps}", font, config.white, config.shadow, fpsf_pos)
     pygame.display.flip()
     fpsc_stop = time.perf_counter()
     fps = round(1 / (fpsc_stop - fpsc_start), 1)

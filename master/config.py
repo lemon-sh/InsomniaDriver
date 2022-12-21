@@ -1,3 +1,5 @@
+# InsomniaDriver Configuration File
+
 # -- DROWSY THRESHOLDS
 
 ear_threshold = 0.18
@@ -25,16 +27,28 @@ gray = (100, 100, 100)
 shadow = (10, 10, 10)
 black = (0, 0, 0)
 
-# -- ENVIRONMENT
+# -- USER INPUT MODE
 
-# DEV - sound alarm, keyboard input
-# PROD - external alarm, GPIO input
-environment = "DEV"
+# 'keyboard' = get user input from the keyboard
+#   - X to disable alarm
+#   - Q to quit application
+
+# 'rpi' = get user input from RPi's GPIO pins
+#   - W.I.P.
+
+input_mode = "keyboard"
 
 # -- ALARM
 
-# required for development environment only
+# 'sound' = plays sound file specified below
+# 'ext' = fires a HTTP request to the slave device
+alarm_type = "sound"
+
+# required for sound type only
 alarm_sound = "assets/alarm.ogg"
+
+# required for external type only
+slave_device = "192.168.0.50"
 
 # -- VIDEO MODES
 

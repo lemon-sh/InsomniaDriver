@@ -7,7 +7,8 @@ import maths
 
 class DrowsyDetector:
     def __init__(self):
-        self._eye_idxs = {"left": [362, 385, 387, 263, 373, 380], "right": [33, 160, 158, 133, 153, 144], }
+        self._eye_idxs = {"left": [362, 385, 387, 263, 373, 380], "right": [
+            33, 160, 158, 133, 153, 144], }
         self._start_time = time.perf_counter()
         self._facemesh_model = mp.solutions.face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=True,
                                                                min_detection_confidence=0.5,
@@ -28,9 +29,9 @@ class DrowsyDetector:
         if results.multi_face_landmarks:
             self.detection = True
             landmarks = results.multi_face_landmarks[0].landmark
-            self.ear, self.coordinates = maths.calculate_avg_ear(landmarks, self._eye_idxs["left"],
-                                                                 self._eye_idxs["right"],
-                                                                 frame_w, frame_h)
+            self.ear, self.coordinates = maths.avg_ear(landmarks, self._eye_idxs["left"],
+                                                       self._eye_idxs["right"],
+                                                       frame_w, frame_h)
 
             if self.ear < ear_thresh:
                 end_time = time.perf_counter()

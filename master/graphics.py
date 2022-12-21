@@ -1,33 +1,12 @@
 import pygame
+import maths
 
-_circle_cache = {}
 _antialias = True
 
 
 def set_font_antialias(antialias):
     global _antialias
     _antialias = antialias
-
-
-def bresenham_circle(r):
-    r = int(round(r))
-    if r in _circle_cache:
-        return _circle_cache[r]
-    x, y, e = r, 0, 1 - r
-    _circle_cache[r] = points = []
-    while x >= y:
-        points.append((x, y))
-        y += 1
-        if e < 0:
-            e += 2 * y - 1
-        else:
-            x -= 1
-            e += 2 * (y - x) - 1
-    points += [(y, x) for x, y in points if x > y]
-    points += [(-x, y) for x, y in points if x]
-    points += [(x, -y) for x, y in points if y]
-    points.sort()
-    return points
 
 
 def draw_text(surface, text, font, fcolor, ocolor, pos, opx=2):
@@ -41,7 +20,7 @@ def draw_text(surface, text, font, fcolor, ocolor, pos, opx=2):
 
     osurf.blit(font.render(text, _antialias, ocolor).convert_alpha(), (0, 0))
 
-    for dx, dy in bresenham_circle(opx):
+    for dx, dy in maths.bresenham_circle(opx):
         surface.blit(osurf, (pos_x + dx + opx, pos_y + dy + opx))
 
     surface.blit(textsurface, (pos_x + opx, pos_y + opx))

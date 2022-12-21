@@ -11,11 +11,12 @@ class Alarm:
         if output_type not in range(2):
             raise ValueError("Invalid output type")
         if alarm_sound is None and output_type == self.OUTPUT_SOUND:
-            raise ValueError("You must supply an alarm sound when using the OUTPUT_SOUND type")
-        
+            raise ValueError(
+                "You must supply an alarm sound when using the OUTPUT_SOUND type")
+
         self._on = False
         self._output_type = output_type
-        
+
         if self._output_type == self.OUTPUT_SOUND:
             pygame.mixer.music.load(alarm_sound)
             pygame.mixer.music.play(-1)
