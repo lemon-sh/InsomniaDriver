@@ -10,7 +10,7 @@ wait_time_threshold = 1.0
 font_type = "file"
 font_size = 24
 font_antialias = True
-font = "CozetteVector.ttf"
+font = "assets/CozetteVector.ttf"
 
 # -- COLORS
 
@@ -34,7 +34,7 @@ environment = "DEV"
 # -- ALARM
 
 # required for development environment only
-alarm_sound = "alarm.ogg"
+alarm_sound = "assets/alarm.ogg"
 
 # -- VIDEO MODES
 
