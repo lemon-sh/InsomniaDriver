@@ -150,7 +150,7 @@ while render_next:
             graphics.draw_text(screen, "Gotowość.", font,
                                config.green, config.shadow, flash_pos)
     else:
-        graphics.draw_text(screen, "Nie wykryto mordy", font,
+        graphics.draw_text(screen, "Nie wykryto twarzy", font,
                            config.red, config.shadow, flash_pos)
 
     process_input()
