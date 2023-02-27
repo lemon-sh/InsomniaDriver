@@ -40,15 +40,7 @@ input_mode = "keyboard"
 
 # -- ALARM
 
-# 'sound' = plays sound file specified below
-# 'ext' = fires a HTTP request to the slave device
-alarm_type = "sound"
-
-# required for sound type only
 alarm_sound = "assets/alarm.ogg"
-
-# required for external type only
-slave_device = "192.168.0.50"
 
 # -- VIDEO MODES
 

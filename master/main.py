@@ -97,19 +97,19 @@ if config.input_mode == "keyboard":
                 elif event.key == pygame.K_q:
                     render_next = False
 elif config.input_mode == "rpi":
+    import RPi.GPIO as GPIO
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(21,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+    
     def process_input():
         global render_next
         pygame.event.pump()
-        # TODO: raspberry pi code
+        if GPIO.input(21) == 0:
+            alarm.disable()
 else:
     raise ValueError(f"Invalid input mode '{config.input_mode}'.")
 
-if config.alarm_type == "sound":
-    alarm = Alarm(Alarm.OUTPUT_SOUND, config.alarm_sound)
-elif config.alarm_type == "external":
-    alarm = Alarm(Alarm.OUTPUT_EXT)
-else:
-    raise ValueError(f"Invalid alarm type: '{config.alarm_type}'.")
+alarm = Alarm(config.alarm_sound)
 
 fpsf_width, fpsf_height = font.size("FPS: 999.9")
 flash_pos = (20, 20)
