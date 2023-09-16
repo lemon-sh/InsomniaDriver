@@ -110,7 +110,7 @@ elif config.input_mode == "rpi":
 else:
     raise ValueError(f"Invalid input mode '{config.input_mode}'.")
 
-alarm = Alarm(config.alarm_sound)
+alarm = Alarm()
 
 fpsf_width, fpsf_height = font.size("FPS: 999.9")
 flash_pos = (20, 20)
