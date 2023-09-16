@@ -9,6 +9,7 @@ import mediapipe as mp
 import cv2
 import time
 import sys
+import RPi.GPIO as GPIO
 
 
 mpver = mp.__version__ if hasattr(mp, '__version__') else '<unknown>'
@@ -87,7 +88,6 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, screen_y)
 render_next = True
 
 if config.input_mode == "rpi" or config.alarm_mode == config.ALARMTYPE_LED:
-    import RPi.GPIO as GPIO
     GPIO.setmode(GPIO.BCM)
 
 if config.input_mode == "keyboard":

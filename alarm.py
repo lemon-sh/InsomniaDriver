@@ -1,5 +1,6 @@
 import pygame.mixer
 import config
+import RPi.GPIO as GPIO
 
 class Alarm:
     def __init__(self):
@@ -11,7 +12,6 @@ class Alarm:
             pygame.mixer.music.play(-1)
             pygame.mixer.music.pause()
         else:
-            import RPi.GPIO as GPIO
             GPIO.setup(config.alarm_led_pin, GPIO.OUT)
 
     def enable(self):
