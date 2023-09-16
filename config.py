@@ -34,13 +34,19 @@ black = (0, 0, 0)
 #   - Q to quit application
 
 # 'rpi' = get user input from RPi's GPIO pins
-#   - W.I.P.
+#   - button press on selected pin to disable alarm
 
 input_mode = "keyboard"
+input_pin = 21
 
 # -- ALARM
 
+ALARMTYPE_SOUND = 0
+ALARMTYPE_LED = 1
+
+alarm_mode = ALARMTYPE_LED
 alarm_sound = "assets/alarm.ogg"
+alarm_led_pin = 20
 
 # -- VIDEO MODES
 

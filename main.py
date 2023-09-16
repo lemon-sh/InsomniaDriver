@@ -86,6 +86,10 @@ cap.set(cv2.CAP_PROP_FRAME_WIDTH, screen_x)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, screen_y)
 render_next = True
 
+if config.input_mode == "rpi" or config.alarm_mode == config.ALARMTYPE_LED:
+    import RPi.GPIO as GPIO
+    GPIO.setmode(GPIO.BCM)
+
 if config.input_mode == "keyboard":
     def process_input():
         global render_next
@@ -97,9 +101,7 @@ if config.input_mode == "keyboard":
                 elif event.key == pygame.K_q:
                     render_next = False
 elif config.input_mode == "rpi":
-    import RPi.GPIO as GPIO
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(21, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(config.input_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     def process_input():
         pygame.event.pump()
