@@ -1,4 +1,4 @@
-print("InsomniaDriver | PŚK Platynowy Indeks / Team SQL Injection\nLoading libraries...")
+print("InsomniaDriver | PŚK Platynowy Indeks\nLoading libraries...")
 
 from alarm import Alarm
 from detector import DrowsyDetector
@@ -53,7 +53,7 @@ title_size_x, title_size_y = title_font.size(title_text)
 title_x = screen_x / 2 - title_size_x / 2
 title_y = screen_y / 2 - title_size_y / 2
 
-sub_text = "Paweł Stolarski & Jakub Piasecki"
+sub_text = "Paweł Stolarski © 2023"
 sub_size_x, sub_size_y = font.size(sub_text)
 sub_x = title_x + title_size_x - sub_size_x
 sub_y = title_y + title_size_y
@@ -99,10 +99,9 @@ if config.input_mode == "keyboard":
 elif config.input_mode == "rpi":
     import RPi.GPIO as GPIO
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(21,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(21, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     def process_input():
-        global render_next
         pygame.event.pump()
         if GPIO.input(21) == 0:
             alarm.disable()
